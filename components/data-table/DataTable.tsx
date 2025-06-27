@@ -28,7 +28,6 @@ import {
   IconChevronRight,
   IconChevronsRight,
   IconChevronsLeft,
-  IconX,
 } from "@tabler/icons-react"
 import {
   ColumnDef,
@@ -48,13 +47,6 @@ import {
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -77,10 +69,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import axios from "axios"
+import { AddEmailsModal } from "./AddEmailsModal"
+import { generateVpnConfigs } from "@/services/api"
 
-// Define the schema based on provided data
+// Schema
 export const schema = z.object({
   id: z.number(),
   name: z.string().email(),
@@ -90,9 +82,7 @@ export const schema = z.object({
 
 // Drag handle component
 function DragHandle({ id }: { id: number }) {
-  const { attributes, listeners } = useSortable({
-    id,
-  })
+  const { attributes, listeners } = useSortable({ id })
 
   return (
     <Button
@@ -108,7 +98,7 @@ function DragHandle({ id }: { id: number }) {
   )
 }
 
-// Define columns for the data structure
+// Columns
 const columns: ColumnDef<z.infer<typeof schema>>[] = [
   {
     id: "drag",
@@ -156,14 +146,8 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     header: "Config",
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <span className="truncate max-w-[150px]">{row.original.config_path.slice(0, 20)}...</span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => alert(row.original.config_path)}
-        >
-          View
-        </Button>
+        <span className="truncate max-w-[150px]">{row.original?.config_path.slice(0, 20)}...</span>
+   
       </div>
     ),
   },
@@ -192,7 +176,7 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
       className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
       style={{
         transform: CSS.Transform.toString(transform),
-        transition: transition,
+        transition,
       }}
     >
       {row.getVisibleCells().map((cell) => (
@@ -209,8 +193,7 @@ export function DataTable({
 }: {
   data: z.infer<typeof schema>[]
 }) {
-  // Generate IDs if not provided in the data
-  const processedData = React.useMemo(() => 
+  const processedData = React.useMemo(() =>
     initialData.map((item, index) => ({
       ...item,
       id: item.id ?? index + 1,
@@ -228,9 +211,6 @@ export function DataTable({
     pageSize: 10,
   })
   const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [emails, setEmails] = React.useState<string[]>([])
-  const [newEmail, setNewEmail] = React.useState("")
-  const [loading, setLoading] = React.useState(false)
   const sortableId = React.useId()
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -239,7 +219,7 @@ export function DataTable({
   )
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id) || [],
+    () => data.map(({ id }) => id),
     [data]
   )
 
@@ -279,56 +259,17 @@ export function DataTable({
     }
   }
 
-  const handleAddEmail = () => {
-    if (newEmail && z.string().email().safeParse(newEmail).success) {
-      setEmails((prev) => [...prev, newEmail])
-      setNewEmail("")
-    } else {
-      alert("Please enter a valid email address")
-    }
-  }
-
-  const handleRemoveEmail = (emailToRemove: string) => {
-    setEmails((prev) => prev.filter((email) => email !== emailToRemove))
-  }
-
-  const handleGenerateClick = async () => {
+  const handleGenerateClick = async (emails: string[]) => {
     if (emails.length === 0) return
 
-    const results: any[] = []
-    setLoading(true)
-
-    for (const email of emails) {
-      try {
-        const response = await axios.post(
-          "http://196.189.239.113:5000/generate",
-          { name: email },
-          {
-            headers: {
-              Authorization: "Basic " + btoa("admin:your-secure-password"),
-              "Content-Type": "application/json",
-            },
-          }
-        )
-
-        const res = response.data
-        const item = {
-          id: results.length + data.length + 1,
-          name: res?.name || email,
-          ip: res?.ip || "N/A",
-          config_path: res?.config || "N/A",
-        }
-        results.push(item)
-        console.log("Successfully sent", email, ":", item)
-      } catch (err) {
-        console.error("Failed to send", email, err)
-      }
+    try {
+      const results = await generateVpnConfigs(emails, data.length)
+      setData((prev) => [...prev, ...results])
+      setIsModalOpen(false)
+    } catch (error) {
+      console.error("Failed to generate VPN configs:", error)
+      alert("Failed to add emails. Please try again.")
     }
-
-    setData((prev) => [...prev, ...results])
-    setEmails([])
-    setIsModalOpen(false)
-    setLoading(false)
   }
 
   return (
@@ -348,17 +289,14 @@ export function DataTable({
                 .getAllColumns()
                 .filter(
                   (column) =>
-                    typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide()
+                    typeof column.accessorFn !== "undefined" && column.getCanHide()
                 )
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -412,10 +350,7 @@ export function DataTable({
                   </SortableContext>
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
                       No results.
                     </TableCell>
                   </TableRow>
@@ -436,15 +371,10 @@ export function DataTable({
               </Label>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value))
-                }
-              }
+                onValueChange={(value) => table.setPageSize(Number(value))}
               >
                 <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                  <SelectValue
-                    placeholder={table.getState().pagination.pageSize}
-                  />
+                  <SelectValue placeholder={table.getState().pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
                   {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -503,56 +433,11 @@ export function DataTable({
           </div>
         </div>
       </div>
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Add Emails Manually</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="email"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter email address"
-              />
-            </div>
-            <Button onClick={handleAddEmail} disabled={!newEmail}>
-              Add Email
-            </Button>
-            <div className="flex flex-wrap gap-2">
-              {emails.map((email) => (
-                <div
-                  key={email}
-                  className="flex items-center gap-1 bg-muted px-2 py-1 rounded-full text-sm"
-                >
-                  {email}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-5"
-                    onClick={() => handleRemoveEmail(email)}
-                  >
-                    <IconX className="size-3" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              onClick={handleGenerateClick}
-              disabled={emails.length === 0 || loading}
-            >
-              {loading ? "Submitting..." : "Submit Emails"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AddEmailsModal
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        onSubmit={handleGenerateClick}
+      />
     </div>
   )
 }

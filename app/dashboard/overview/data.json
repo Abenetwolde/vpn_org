@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "email": "john.doe@example.com",
+    "phoneNumber": "+1-555-123-4567",
+    "qrCodes": "A3F7K9M2",
+    "joinDate": "2025-01-15"
+  },
+  {
+    "id": 2,
+    "email": "jane.smith@example.com",
+    "phoneNumber": "+1-555-987-6543",
+    "qrCodes": "P8N4T6R5",
+    "joinDate": "2024-11-22"
+  },
+  {
+    "id": 3,
+    "email": "alice.johnson@example.com",
+    "phoneNumber": "+1-555-456-7890",
+    "qrCodes": "W2Y6B8Q3",
+    "joinDate": "2025-03-10"
+  },
+  {
+    "id": 4,
+    "email": "bob.wilson@example.com",
+    "phoneNumber": "+1-555-321-0987",
+    "qrCodes": "J5C9L3Z7",
+    "joinDate": "2024-09-05"
+  },
+  {
+    "id": 5,
+    "email": "emma.brown@example.com",
+    "phoneNumber": "+1-555-654-3210",
+    "qrCodes": "V4R8N6P2",
+    "joinDate": "2025-06-01"
+  },
+  {
+    "id": 6,
+    "email": "michael.lee@example.com",
+    "phoneNumber": "+1-555-789-1234",
+    "qrCodes": "T9M3K7F5",
+    "joinDate": "2024-12-18"
+  },
+  {
+    "id": 7,
+    "email": "sarah.davis@example.com",
+    "phoneNumber": "+1-555-234-5678",
+    "qrCodes": "Q6B2Y4W8",
+    "joinDate": "2025-02-25"
+  },
+  {
+    "id": 8,
+    "email": "david.martin@example.com",
+    "phoneNumber": "+1-555-876-5432",
+    "qrCodes": "Z3L5C9J6",
+    "joinDate": "2024-10-30"
+  },
+  {
+    "id": 9,
+    "email": "linda.white@example.com",
+    "phoneNumber": "+1-555-345-6789",
+    "qrCodes": "N7P4V8R2",
+    "joinDate": "2025-04-12"
+  },
+  {
+    "id": 10,
+    "email": "chris.moore@example.com",
+    "phoneNumber": "+1-555-567-8901",
+    "qrCodes": "K5T3M9F7",
+    "joinDate": "2025-05-20"
+  }
+]

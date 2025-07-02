@@ -1,0 +1,45 @@
+{
+  "name": "@abnet-wolde/ethiopian-map",
+  "version": "1.0.7",
+  "description": "A customizable React component for interactive SVG maps of Ethiopian regions with TypeScript support",
+  "main": "./dist/index.es.js",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "jest"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "ethiopia",
+    "map",
+    "svg",
+    "interactive-map",
+    "geographic-component",
+    "react-component",
+    "ethiopian-regions",
+    "data-visualization"
+  ],
+  "author": "Abnet Wolde",
+  "homepage": "https://github.com/Abenetwolde/ethiopian_map.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Abenetwolde/ethiopian_map.git"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^19.0.0 || ^19.0.0",
+    "react-dom": "^19.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@testing-library/react": "^16.3.0",
+    "@vitejs/plugin-react": "^4.6.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "yalcSig": "4c3d2f5d7322ad70cb2328d42edf2ecd"
+}

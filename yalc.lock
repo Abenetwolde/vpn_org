@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "@abnet-wolde/ethiopian-map": {
+      "signature": "4c3d2f5d7322ad70cb2328d42edf2ecd",
+      "file": true,
+      "replaced": "file:../ethiopian_map/abnet-wolde-ethiopian-map-1.0.7.tgz"
+    }
+  }
+}
